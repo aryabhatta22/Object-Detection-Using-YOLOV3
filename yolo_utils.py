@@ -33,7 +33,7 @@ def generate_boxes_confidences_classids(outs, height, width,tconf):
             box = detection[0:4] * np.array([width, height, width, height])
             centerX, centerY, bwidth, bheight = box.astype('int')
 
-            // top coordinates
+            # top coordinates
 
             x = int(centerX - (bwidth/2))
             y = int(centerY - (bheight/2))
@@ -41,3 +41,19 @@ def generate_boxes_confidences_classids(outs, height, width,tconf):
             confidences.append(float(confidence))
             classids.append(classid)
     return boxes, confidences, classids
+
+# for inference on video
+
+def infer_image(net, layer_names, height, width, img, colors, labels, FLAGS, boxes=None, confidences=None, classids=None, infer=True):
+    if infer:
+        blob = cv.dnn.blobFromImage(img, 1/255.0, (416,416), swapRB = True, crop=False)
+        net.setInput(blob)
+        outs = net.forward(layer_names)
+        boxes, confidences, classids = generate_boxes_confidences_classids(outs, height, width, FLAGS.confidence)
+        idxs = cv.dnn.NMSBoxes(boxes, confidences, FLAGS, FLAGS.threshold)
+    if boxes is None or confidences is None or idxs is None or classids is None:
+        raise '[ERROR] Required variable are set to None.'
+    img = draw_labels_and_boxes(img, boxes, confiidences, classids, idxs, colors, labels)
+
+    return img, boxes, confidences, classids, idxs
+
