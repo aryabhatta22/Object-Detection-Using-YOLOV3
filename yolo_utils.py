@@ -25,21 +25,21 @@ def generate_boxes_confidences_classids(outs, height, width,tconf):
 
     for out in outs:
         for detection in outs:
-        scores = detections[5:]
-        classid = np.argmax(scores)
-        confidence = scores[classid]
+            scores = detections[5:]
+            classid = np.argmax(scores)
+            confidence = scores[classid]
 
-        if confidence > tconf:
-            box = detection[0:4] * np.array([width, height, width, height])
-            centerX, centerY, bwidth, bheight = box.astype('int')
+            if confidence > tconf:
+                box = detection[0:4] * np.array([width, height, width, height])
+                centerX, centerY, bwidth, bheight = box.astype('int')
 
-            # top coordinates
+                # top coordinates
 
-            x = int(centerX - (bwidth/2))
-            y = int(centerY - (bheight/2))
-            boxes.append([x,y, int(bwidth), int(bheight)])
-            confidences.append(float(confidence))
-            classids.append(classid)
+                x = int(centerX - (bwidth/2))
+                y = int(centerY - (bheight/2))
+                boxes.append([x,y, int(bwidth), int(bheight)])
+                confidences.append(float(confidence))
+                classids.append(classid)
     return boxes, confidences, classids
 
 # for inference on video
